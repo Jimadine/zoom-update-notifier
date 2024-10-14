@@ -57,6 +57,9 @@ param(
   The full file path to zoom.exe [String]
 #>
 function Get-ZoomExeVersion {
+  param(
+    [string]$Path
+  )
   If (!(Test-Path -Path $Path)) {
     Add-Type -AssemblyName System.Windows.Forms
     $message = "zoom.exe does not exist at '${Path}'"
