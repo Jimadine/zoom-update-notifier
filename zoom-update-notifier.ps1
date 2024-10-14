@@ -85,7 +85,7 @@ function Get-ZoomLatestVersion {
     [uri]$url = 'https://zoom.us/client/latest/ZoomInstallerFull.msi'
   }
 
-  # Code here is to handle dIfferences between Powershell 5.1 & 7.4 - https://github.com/PowerShell/PowerShell/issues/4534
+  # Code here is to handle differences between Powershell 5.1 & 7.4 - https://github.com/PowerShell/PowerShell/issues/4534
   Try {
     $response = Invoke-WebRequest -Uri "$url" -UserAgent "$uas" -Method Head -MaximumRedirection 0 -ErrorAction Ignore
   }
