@@ -11,7 +11,9 @@ Out of frustration that — despite Zoom Workplace running in the background all
 ## What the script does
 * It extracts the version number of the currently installed version of Zoom from the `zoom.exe` executable file on your computer
 * It then makes a single `HEAD` request to a specific Zoom URL. The response returned includes the version number of the latest version in the `Location` header
-* It then compares the two version numbers, and if the latest version is greater than the installed version, it will pop a dialogue box (or send an email to you) to let you know
+* It then compares the two version numbers, and if the latest version is greater than the installed version, it will pop a dialogue box (or send an email to you) to let you know:
+
+![An image of the test window](./window_screenshot_live.png?raw=true)
 
 ## Setting things up
 The script is intended to be set up as a daily scheduled task with one or more time triggers (depending on how many times a day you wish to have the script perform the check).
@@ -23,7 +25,7 @@ Set-Location "C:\path\to\repo"
 ```
 You should see a pop-up as follows:
 
-![An image of the test window](./window_screenshot.png?raw=true)
+![An image of the test window](./window_screenshot_test.png?raw=true)
 
 <sub>In the above screenshot, the installed version and latest version match, which is expected when passing the `-IsTest` switch parameter</sub>
 
