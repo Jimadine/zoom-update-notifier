@@ -54,3 +54,8 @@ Arguments: //B "C:\path\to\silent.vbs" "%SystemRoot%\System32\WindowsPowerShell\
 * If you're unsure where `zoom.exe` is, `where.exe /F /R \ zoom.exe` is your friend.
 * When creating the scheduled task, and setting time triggers for times that your computer is likely to be turned off at, it's probably worth enabling the `Run the task as soon as possible after a scheduled start is missed` option under the `Settings` tab
 * The script's email functionality relies on the deprecated `Send-MailMessage` cmdlet and so only supports unauthenticated email
+* To update Zoom after you've been notified of an update:
+    * Open Zoom
+    * Click your profile pic (top-right)
+    * From the menu, click `Check for updates`
+    * You should see an option to update
