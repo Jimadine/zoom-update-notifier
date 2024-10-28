@@ -4,7 +4,7 @@
 An unofficial Powershell script to notify you when there is a Zoom update available
 
 ## Why this script exists
-Out of frustration that — despite Zoom Workplace running in the background all of the time — the Zoom Updater functionality only tells me that an update is required at the very moment I attempt to join a meeting. An update usually takes a few minutes to install, so has made me late for meetings!
+Out of frustration that — despite Zoom Workplace running in the background all of the time — the Zoom Updater functionality only tells me that an update is required at the very moment I attempt to join a meeting, and prevents me from joining said meeting until the update is installed. An update usually takes a few minutes to install, so has made me late for meetings!
 
 :rage: :rage: :rage:
 
