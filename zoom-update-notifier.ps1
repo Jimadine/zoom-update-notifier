@@ -97,7 +97,7 @@ function Get-ZoomLatestVersion {
       [uri]$location = $response.Headers.Location
     }
   }
-  $latestVersion = $location.Segments[2].TrimEnd('/') | Where-Object { $_ -match '\d\.\d\.\d{1,2}\.\d{1,5}' } | Select-Object -First 1
+  $latestVersion = $location.Segments[2].TrimEnd('/') | Where-Object { $_ -match '^\d+\.\d+\.\d+\.\d+$' } | Select-Object -First 1
   If ([string]::IsNullOrEmpty($latestVersion)) {
     Add-Type -AssemblyName System.Windows.Forms
     $null = [System.Windows.Forms.MessageBox]::Show('Failed to retrieve the latest version number from the web.', 'Zoom Update Notifier: Error', [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
