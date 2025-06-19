@@ -87,13 +87,21 @@ function Get-ZoomLatestVersion {
 
   # Code here is to handle differences between Powershell 5.1 & 7.4 - https://github.com/PowerShell/PowerShell/issues/4534
   Try {
-    $response = Invoke-WebRequest -Uri $url -UserAgent $uas -Method Head -MaximumRedirection 0 -ErrorAction Ignore
+    $iwr = @{
+      Uri                = $url
+      Method             = 'HEAD'
+      MaximumRedirection = 0
+      UseBasicParsing    = $true
+      UserAgent          = $uas
+      ErrorAction        = 'Ignore'
+    }
+    $response = Invoke-WebRequest @iwr
   }
-  Catch [Microsoft.PowerShell.Commands.HttpResponseException] {
+  Catch {
     [uri]$location = $_.Exception.Response.Headers.Location
   }
   Finally {
-    If ($null -eq $location -or [string]::IsNullOrEmpty($location.AbsoluteUri)) {
+    If ([string]::IsNullOrEmpty($location.AbsoluteUri)) {
       [uri]$location = $response.Headers.Location
     }
   }
