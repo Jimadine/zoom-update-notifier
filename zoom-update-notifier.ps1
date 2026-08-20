@@ -18,7 +18,7 @@
   For email notifications, specify the FQDN of an SMTP server. Only applicable when -EnableEmail is supplied. [string]
 
   .PARAMETER MailSubject
-  For email notifications, specify the subject line of the email. Only applicable when -EnableEmail is supplied. The default subject is 'Generic SFTP Upload notification' [string]
+  For email notifications, specify the subject line of the email. Only applicable when -EnableEmail is supplied. The default subject is 'Zoom Update Notifier: Update Available' [string]
 
   .PARAMETER MailToAddress
   For email notifications, specify the To: address. Only applicable when -EnableEmail is supplied. Separate multiple addresses with a comma. [string]
