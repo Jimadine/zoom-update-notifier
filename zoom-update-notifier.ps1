@@ -175,7 +175,7 @@ function Initialize-Notification {
     [version]$InstalledVersion,
     [version]$LatestVersion
   )
-  If ($LatestVersion -gt $InstalledVersion -or $Script:IsTest) {
+  If ($InstalledVersion.CompareTo($LatestVersion) -lt 0 -or $Script:IsTest) {
     If ($Script:EnableEmail) {
       Send-Email `
         -MailFromAddress $Script:MailFromAddress `
