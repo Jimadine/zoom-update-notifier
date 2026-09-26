@@ -1,0 +1,126 @@
+#Requires -Version 5.1
+
+<#
+  .SYNOPSIS
+  Powershell script to check the installed version of Zoom and the latest available version of Zoom, and pop a dialogue or send an email if there is a mismatch.
+  Note that if there is an error, this will be displayed in a window even if you have chosen to send an email.
+
+  .PARAMETER IsTest
+  Unconditionally pops the 'Update available' window or sends an email (depending on whether the -EnableEmail switch was passed)
+
+  .PARAMETER EnableEmail
+  Whether to send an email instead of popping a window [switch]
+
+  .PARAMETER MailFromAddress
+  For email notifications, specify the From: address. Only applicable when -EnableEmail is supplied. [string]
+
+  .PARAMETER MailServer
+  For email notifications, specify the FQDN of an SMTP server. Only applicable when -EnableEmail is supplied. [string]
+
+  .PARAMETER MailSubject
+  For email notifications, specify the subject line of the email. Only applicable when -EnableEmail is supplied. The default subject is 'Generic SFTP Upload notification' [string]
+
+  .PARAMETER MailToAddress
+  For email notifications, specify the To: address. Only applicable when -EnableEmail is supplied. [string]
+
+  .PARAMETER ZoomExePath
+  The full file path to zoom.exe [String]
+
+#>
+[CmdletBinding(DefaultParameterSetName = 'window')]
+param(
+    [Parameter(Mandatory, ParameterSetName = 'email')]
+    [switch]$EnableEmail,
+
+    [Parameter(ParameterSetName = 'window')]
+    [Parameter(ParameterSetName = 'email')]
+    [switch]$IsTest,
+
+    [Parameter(Mandatory, ParameterSetName = 'email')]
+    [string]$MailFromAddress,
+
+    [Parameter(Mandatory, ParameterSetName = 'email')]
+    [string]$MailServer,
+  
+    [Parameter(ParameterSetName = 'email')]
+    [string]$MailSubject = 'Zoom Update Notifier: Update Available',
+  
+    [Parameter(Mandatory, ParameterSetName = 'email')]
+    [string]$MailToAddress,
+
+    [Parameter(ParameterSetName = 'window')]
+    [Parameter(ParameterSetName = 'email')]
+    [string]$ZoomExePath = 'C:\Program Files\Zoom\bin\zoom.exe'
+)
+
+[string]$uas = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
+If ([Environment]::Is64BitOperatingSystem) {
+    [uri]$url = 'https://zoom.us/client/latest/ZoomInstallerFull.msi?archType=x64'
+} Else {
+    [uri]$url = 'https://zoom.us/client/latest/ZoomInstallerFull.msi'
+}
+
+If (!(Test-Path -Path $ZoomExePath)) {
+    Add-Type -AssemblyName System.Windows.Forms
+    $message = "zoom.exe does not exist at '${ZoomExePath}'"
+    $null = [System.Windows.Forms.MessageBox]::Show($message, "Zoom Update Notifier: Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    Exit 1
+}
+
+$installedVersion = (Get-Item -Path $ZoomExePath).VersionInfo.FileVersionRaw.ToString()
+If ([string]::IsNullOrEmpty($installedVersion)) {
+    Add-Type -AssemblyName System.Windows.Forms
+    $message = "Failed to retrieve the version number from '${ZoomExePath}'"
+    $null = [System.Windows.Forms.MessageBox]::Show($message, "Zoom Update Notifier: Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    Exit 1
+}
+
+# Code here is to handle dIfferences between Powershell 5.1 & 7.4 - https://github.com/PowerShell/PowerShell/issues/4534
+Try {
+    $response = Invoke-WebRequest -Uri "$url" -UserAgent "$uas" -Method Head -MaximumRedirection 0 -ErrorAction Ignore
+} Catch [Microsoft.PowerShell.Commands.HttpResponseException] {
+    [uri]$location = $_.Exception.Response.Headers.Location
+} Finally {    
+    If ($null -eq $location -or [string]::IsNullOrEmpty($location.AbsoluteUri)) {
+        [uri]$location = $response.Headers.Location
+    }    
+}
+
+# 12/10/2024: Alternative Powershell code to get the latest version:
+#
+# $curlExe = [System.Environment]::SystemDirectory + "\curl.exe"
+# if (!(Test-Path -Path $curlExe)) {
+#     Add-Type -AssemblyName System.Windows.Forms
+#     $message = "curl.exe does not exist at '$curlExe'"
+#     $null = [System.Windows.Forms.MessageBox]::Show($message, "Zoom Update Notifier: Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+#     exit 1
+# }
+# $latestVersion = (& $curlExe -s -A "$uas" -I "$url" | Where-Object { $_ -match "/prod/([0-9\.]+)/x64/" } | ForEach-Object { $matches[1] })
+
+$latestVersion = $location.Segments[2].TrimEnd('/') | Where-Object { $_ -match "\d\.\d\.\d\.\d{1,5}" } | Select-Object -First 1
+If ([string]::IsNullOrEmpty($latestVersion)) {
+    Add-Type -AssemblyName System.Windows.Forms
+    $message = 'Failed to retrieve the latest version number from the web.'
+    $null = [System.Windows.Forms.MessageBox]::Show($message, "Zoom Update Notifier: Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    Exit 1
+}
+
+If ($latestVersion -ne $installedVersion -or $IsTest) {
+    $title = 'Zoom Update Notifier: Update Available'
+    If ($EnableEmail -and $title -ne $MailSubject) {
+        $title = $MailSubject
+    }
+    $message = "Installed version is ${installedVersion}`nLatest version is ${latestVersion}`nUpdate available!"
+    If ($EnableEmail) {
+$emailBody = @"
+${message}
+
+This email was generated by $(Split-Path -Path $PSCommandPath -Leaf) at $((Get-Date).ToString('dd/MM/yyyy HH:mm:ss')) on $(([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname).
+"@
+        Send-MailMessage -SmtpServer $MailServer -From $MailFromAddress -To $MailToAddress -Subject $MailSubject -Body $emailBody
+    } Else {
+        Add-Type -AssemblyName System.Windows.Forms
+        $null = [System.Windows.Forms.MessageBox]::Show($message, $title, [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+    }
+    Exit 2
+}
