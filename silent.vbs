@@ -12,4 +12,5 @@ For i = 0 To WScript.Arguments.Count-1
 
 Next
 
-CreateObject("WScript.Shell").Run Join(args, " "), 0, False
+exitCode = CreateObject("WScript.Shell").Run(Join(args, " "), 0, True)
+WScript.Quit exitCode
