@@ -40,7 +40,7 @@ When creating the scheduled task `Action`, here are the commands and arguments t
 Program/script: C:\Windows\System32\wscript.exe
 Arguments: //B "C:\path\to\silent.vbs" "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoLogo -NoProfile -ExecutionPolicy ByPass -File "C:\path\to\zoom-update-notifier.ps1"
 ```
-Note `silent.vbs` is a small generic wrapper script included in this repo that allows you to run Powershell silently. It's the only bulletproof method to avoid seeing a Powershell window.
+Note `silent.vbs` is a small generic wrapper script included in this repo that allows you to run Powershell silently. It's the only bulletproof method to avoid seeing a Powershell window, but using it does mean that the exit code of the ran Powershell script gets dropped; the scheduled task `Last Run Result` will thus always be `0x0`.
 
 Example scheduled task `Action` for emails:
 ```
