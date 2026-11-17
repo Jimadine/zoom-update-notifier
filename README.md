@@ -38,14 +38,14 @@ If you want to test the emails you can also do that by passing the `-EnableEmail
 When creating the scheduled task `Action`, here are the commands and arguments that I would suggest adding:
 ```
 Program/script: C:\Windows\System32\wscript.exe
-Arguments: //B "C:\path\to\silent.vbs" "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoLogo -NoProfile -ExecutionPolicy ByPass -File "C:\path\to\zoom-update-notifier.ps1"
+Arguments: //B "C:\path\to\silent.vbs" "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -File "C:\path\to\zoom-update-notifier.ps1"
 ```
 Note `silent.vbs` is a small generic wrapper script included in this repo that allows you to run Powershell silently. It's the only bulletproof method to avoid seeing a Powershell window.
 
 Example scheduled task `Action` for emails:
 ```
 Program/script: C:\Windows\System32\wscript.exe
-Arguments: //B "C:\path\to\silent.vbs" "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoLogo -NoProfile -ExecutionPolicy ByPass -File "C:\path\to\zoom-update-notifier.ps1" -EnableEmail -MailFromAddress fromaddress@example.org -MailToAddress youraddress@example.org -MailServer smtp.example.org
+Arguments: //B "C:\path\to\silent.vbs" "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -File "C:\path\to\zoom-update-notifier.ps1" -EnableEmail -MailFromAddress fromaddress@example.org -MailToAddress youraddress@example.org -MailServer smtp.example.org
 ```
 
 ## Notes
